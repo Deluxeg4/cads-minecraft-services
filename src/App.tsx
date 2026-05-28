@@ -1,203 +1,443 @@
+import { useState } from 'react';
 import { motion } from 'motion/react';
-import { 
-  Code2, 
-  Layers, 
-  Terminal, 
-  Boxes, 
-  MessageSquare, 
+import {
   ArrowRight,
+  Boxes,
+  Check,
+  Clipboard,
+  Code2,
+  Disc3,
   Cpu,
-  ExternalLink
+  ExternalLink,
+  Github,
+  Layers,
+  MessageSquare,
+  Pickaxe,
+  RefreshCw,
+  Server,
+  ShieldCheck,
+  Sword,
+  Terminal,
+  Zap,
 } from 'lucide-react';
+
+const DISCORD_URL = 'https://discord.gg/xtVgj52nN6';
+const LOGO_SRC = '/Gemini_Generated_Image_mql5dwmql5dwmql5-Photoroom.png';
+
+const SERVER_TYPES = ['SMP', 'Anarchy', 'DonutSMP', 'Survival', 'Network'];
+
+const METRICS = [
+  { value: '25-50%', label: 'Performance uplift target' },
+  { value: '24/7', label: 'Uptime-first mindset' },
+  { value: '1:1', label: 'Custom setup per server' },
+];
+
+const REASONS = [
+  {
+    icon: <Zap />,
+    title: 'จูนจากปัญหาจริง',
+    desc: 'ดู hardware, plugin, player flow และ log ก่อนปรับ ไม่ใช้ config สำเร็จรูปแบบเดาสุ่ม',
+  },
+  {
+    icon: <ShieldCheck />,
+    title: 'เน้นเสถียรภาพ',
+    desc: 'คิดเรื่อง crash, lag spike, downtime และการดูแลต่อหลังส่งมอบตั้งแต่ขั้นออกแบบ',
+  },
+  {
+    icon: <Boxes />,
+    title: 'พร้อมขยายต่อ',
+    desc: 'วางระบบให้โตต่อได้ ตั้งแต่ Survival เล็กๆ ไปจนถึง proxy network หลายเซิร์ฟเวอร์',
+  },
+  {
+    icon: <RefreshCw />,
+    title: 'Lifetime Support',
+    desc: 'ดูแลหลังการขายระยะยาว ให้คำแนะนำและช่วยแก้ปัญหาที่เกี่ยวกับงานที่ส่งมอบ',
+  },
+];
 
 const SERVICES = [
   {
-    icon: <Code2 className="w-6 h-6" />,
+    icon: <Code2 />,
     title: 'Custom Plugin',
     titleTh: 'พัฒนาและแก้ไขปลั๊กอิน',
-    price: '100฿ +',
-    desc: 'Folia optimization, version updates, and custom forks tailored to your needs.',
-    descTh: 'รองรับ Folia, การอัปเดตเวอร์ชัน และการ Fork ปลั๊กอินเพื่อปรับแต่งฟีเจอร์เฉพาะตัว'
+    price: '100฿+',
+    desc: 'เขียนระบบเฉพาะทาง อัปเดตเวอร์ชัน ปรับ plugin stack และทำให้เข้ากับ workflow ของเซิร์ฟเวอร์',
   },
   {
-    icon: <Terminal className="w-6 h-6" />,
-    title: 'Basic Server Setup',
-    titleTh: 'ตั้งค่าเซิร์ฟเวอร์พื้นฐาน',
-    price: '50฿ +',
-    desc: 'Perfect for Survival with your friends. Optimized and ready to play.',
-    descTh: 'เหมาะสำหรับกลุ่มเพื่อน เล่น Survival ร่วมกัน การตั้งค่าที่เสถียรและพร้อมใช้งานทันที'
+    icon: <Terminal />,
+    title: 'Server Setup',
+    titleTh: 'ตั้งค่าเซิร์ฟเวอร์มายคราฟ',
+    price: '50฿+',
+    desc: 'เหมาะกับ SMP, Survival, Anarchy และเซิร์ฟเวอร์เริ่มต้นที่ต้องการเปิดใช้งานจริงแบบนิ่งๆ',
   },
   {
-    icon: <Cpu className="w-6 h-6" />,
-    title: 'Medium Scale Setup',
-    titleTh: 'เซิร์ฟเวอร์ขนาดกลาง (10-20 Players)',
-    price: '100฿ +',
-    desc: 'Performance-optimized configuration for growing player bases.',
-    descTh: 'การปรับจูนประสิทธิภาพระดับสูง รองรับผู้เล่น 10-20 คน ได้อย่างลื่นไหล'
+    icon: <Cpu />,
+    title: 'Performance Tuning',
+    titleTh: 'จูนประสิทธิภาพ',
+    price: '100฿+',
+    desc: 'ปรับ config, JVM, plugin และระบบหลังบ้านเพื่อลด lag spike และช่วยให้ TPS เสถียรขึ้น',
   },
   {
-    icon: <Layers className="w-6 h-6" />,
-    title: 'Proxy Server Setup',
-    titleTh: 'วางระบบ Proxy (Multiple Servers)',
-    price: '300฿ +',
-    desc: 'BungeeCord or Velocity integration for seamless server networking.',
-    descTh: 'เชื่อมต่อหลายเซิร์ฟเวอร์เข้าด้วยกันด้วย BungeeCord หรือ Velocity อย่างเป็นระบบ'
+    icon: <Layers />,
+    title: 'Proxy Network',
+    titleTh: 'วางระบบหลายเซิร์ฟเวอร์',
+    price: '300฿+',
+    desc: 'ออกแบบ BungeeCord หรือ Velocity สำหรับ network ที่ต้องแยก lobby, survival, event หรือ minigame',
   },
   {
-    icon: <MessageSquare className="w-6 h-6" />,
-    title: 'Server Consulting',
-    titleTh: 'ปรึกษาการตั้งค่าเซิร์ฟเวอร์',
-    price: 'Free',
-    desc: 'Expert guidance on architecture, plugins, and overall server health.',
-    descTh: 'รับปรึกษาและวางแผนผังระบบเซิร์ฟเวอร์ ปลั๊กอิน และการดูแลรักษาเชิงรุก'
+    icon: <MessageSquare />,
+    title: 'Discord Bot',
+    titleTh: 'บอท Discord เชื่อมระบบเซิร์ฟเวอร์',
+    price: 'เริ่มต้นคุยได้',
+    desc: 'ทำบอทสำหรับประกาศ แจ้งเตือน เชื่อม rank หรือ workflow ที่เกี่ยวกับ community ของเซิร์ฟเวอร์',
   },
   {
-    icon: <Boxes className="w-6 h-6" />,
-    title: 'Network Infrastructure',
-    titleTh: 'วางโครงสร้างเครือข่ายและความปลอดภัย',
-    price: '100฿ +',
-    desc: 'Complete network setup with focus on protection and uptime.',
-    descTh: 'จัดการระบบ Network พร้อมระบบป้องกันการโจมตี (DDoS Protection) และป้องกันเซิร์ฟเวอร์ล่ม'
+    icon: <ShieldCheck />,
+    title: 'Website & Infrastructure',
+    titleTh: 'เว็บไซต์และระบบหลังบ้าน',
+    price: 'ประเมินตามงาน',
+    desc: 'ทำเว็บ landing, dashboard, ระบบ status และ infrastructure ให้พร้อมดูแลเซิร์ฟเวอร์ระยะยาว',
+  },
+];
+
+const PORTFOLIO = [
+  {
+    name: 'Deluxeg4',
+    role: 'Plugin Developer / Server Engineer',
+    url: 'https://github.com/Deluxeg4',
+    discord: 'zeb.deluxeg4',
+    tags: ['Backend', 'Plugin', 'Network', 'Web', 'Infrastructure'],
   },
   {
-    icon: <Terminal className="w-6 h-6" />,
-    title: 'Switch To Linux Setup',
-    titleTh: 'ย้ายระบบและตั้งค่าบน Linux',
-    price: '100฿ +',
-    desc: 'Professional migration for maximum performance and stability.',
-    descTh: 'การันตี Performance Upgrade 25-50% พร้อมการปรับจูน OS ให้ลื่นไหลที่สุด'
-  }
+    name: 'PolarBearEX-8',
+    role: 'Infrastructure / Minecraft Systems',
+    url: 'https://github.com/PolarBearEX-8',
+    discord: 'polarac.java',
+    tags: ['Plugin', 'ServerLogic', 'Proxy & Server'],
+  },
+];
+
+const PROCESS = [
+  'ตรวจสภาพ server, plugins และปัญหาหลัก',
+  'ออกแบบ solution ที่พอดีกับงบ จำนวนผู้เล่น และแนวเซิร์ฟเวอร์',
+  'ลงมือ setup, test, benchmark และส่งมอบพร้อมคำแนะนำ',
 ];
 
 export default function App() {
+  const [copiedDiscord, setCopiedDiscord] = useState<string | null>(null);
+
+  const copyDiscordTag = async (discord: string) => {
+    await navigator.clipboard.writeText(discord);
+    setCopiedDiscord(discord);
+    window.setTimeout(() => setCopiedDiscord(null), 1800);
+  };
+
   return (
-    <div className="min-h-screen">
-      {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-zinc-100">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <img 
-              src="/Gemini_Generated_Image_mql5dwmql5dwmql5-Photoroom.png" 
-              alt="CADS Logo" 
-              className="w-10 h-10 object-contain"
-            />
-            <span className="font-mono text-xl font-bold tracking-tighter text-zinc-900 border-b-2 border-zinc-900">CADS.</span>
+    <div className="min-h-screen overflow-hidden bg-[#050607] text-white">
+      <div className="site-glow site-glow-one" />
+      <div className="site-glow site-glow-two" />
+
+      <nav className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-black/45 backdrop-blur-xl">
+        <div className="mx-auto flex h-18 max-w-7xl items-center justify-between px-5 md:px-8">
+          <a href="#" className="flex items-center gap-3" aria-label="CADS Studio home">
+            <img src={LOGO_SRC} alt="CADS Studio" className="h-10 w-10 object-contain" />
+            <div>
+              <p className="font-mono text-lg font-bold leading-none tracking-tight">CADS</p>
+              <p className="text-[11px] font-medium uppercase tracking-[0.28em] text-zinc-500">Minecraft Services</p>
+            </div>
+          </a>
+
+          <div className="hidden items-center gap-8 text-sm font-medium text-zinc-400 md:flex">
+            <a href="#services" className="transition hover:text-white">Services</a>
+            <a href="#portfolio" className="transition hover:text-white">GitHub</a>
+            <a href="#contact" className="transition hover:text-white">Contact</a>
           </div>
-          <div className="flex items-center gap-10 text-sm font-medium text-zinc-500">
-            <a href="#services" className="hover:text-zinc-900 transition-colors">Services</a>
-            <a href="https://discord.gg/xtVgj52nN6" target="_blank" rel="noreferrer" className="btn-primary py-2 px-6 text-sm rounded-full flex items-center gap-2">
-              Contact <ExternalLink className="w-4 h-4" />
-            </a>
-          </div>
+
+          <a href={DISCORD_URL} target="_blank" rel="noreferrer" className="icon-button compact">
+            <MessageSquare className="h-4 w-4" />
+            Discord
+          </a>
         </div>
       </nav>
 
-      {/* Hero */}
-      <section className="pt-48 pb-32 px-6">
-        <div className="max-w-4xl mx-auto text-center">
+      <main>
+        <section className="hero-center px-5 pb-16 pt-24 md:px-8 md:pt-30">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 22 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
+            transition={{ duration: 0.7, ease: 'easeOut' }}
+            className="hero-stage"
           >
-            <div className="flex justify-center mb-12">
-              <motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.2, type: "spring", stiffness: 100 }}
-                className="relative"
-              >
-                <div className="absolute inset-0 bg-zinc-900/5 blur-3xl rounded-full" />
-                <img 
-                  src="/Gemini_Generated_Image_mql5dwmql5dwmql5-Photoroom.png" 
-                  alt="CADS Studio Logo" 
-                  className="w-32 h-32 md:w-48 md:h-48 object-contain relative z-10"
-                />
-              </motion.div>
+            <div className="hero-visual" aria-hidden="true">
+              <div className="minecraft-block-grid">
+                <span />
+                <span />
+                <span />
+                <span />
+                <span />
+                <span />
+              </div>
             </div>
-            
-            <h1 className="text-6xl md:text-8xl font-bold tracking-tight text-zinc-900 mb-8">
-              Reliable <span className="text-zinc-400 italic">Server</span> Engineering.
-            </h1>
-            <p className="text-xl text-zinc-500 max-w-2xl mx-auto mb-12 leading-relaxed">
-              CADS Studio มอบโซลูชันระดับโปรสำหรับ Minecraft Server ด้วยความเชี่ยวชาญด้านโครงสร้างระบบและประสิทธิภาพขั้นสูง
-            </p>
-            <div className="flex justify-center">
-              <a href="https://discord.gg/xtVgj52nN6" target="_blank" rel="noreferrer" className="btn-primary rounded-full group px-8 py-4">
-                ติดต่อสอบถามผ่าน Discord <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </a>
+
+            <div className="hero-content">
+              <div className="hero-pill">
+                <Pickaxe className="h-4 w-4" />
+                Setup, plugins, websites, Discord bots and server systems
+              </div>
+
+              <h1>
+                รับทำ Minecraft Server
+                <span>ครบจบในทีมเดียว</span>
+              </h1>
+
+              <p className="hero-copy">
+                CADS Studio ดูแลตั้งแต่ Setup เซิร์ฟเวอร์มายคราฟ เขียน Plugin ทำเว็บไซต์ บอท Discord
+                ไปจนถึงวางระบบหลังบ้าน โดยทีมที่มีประสบการณ์กว่า 7 ปี และเข้าใจงานเซิร์ฟเวอร์ที่ต้องใช้งานจริง
+              </p>
+
+              <div className="hero-actions">
+                <a href={DISCORD_URL} target="_blank" rel="noreferrer" className="primary-button">
+                  เริ่มคุยโปรเจกต์
+                  <ArrowRight className="h-5 w-5" />
+                </a>
+                <a href="#services" className="secondary-button">
+                  ดูบริการทั้งหมด
+                  <ExternalLink className="h-4 w-4" />
+                </a>
+              </div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.55, delay: 0.2, ease: 'easeOut' }}
+                className="developer-callout center"
+              >
+                <div>
+                  <p>Need Developer for your Minecraft server?</p>
+                  <span>SMP, Anarchy, DonutSMP หรือเซิร์ฟเวอร์แนว custom สามารถติดต่อได้</span>
+                </div>
+                <a href={DISCORD_URL} target="_blank" rel="noreferrer">
+                  Contact
+                  <MessageSquare className="h-4 w-4" />
+                </a>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.3, ease: 'easeOut' }}
+                className="server-type-row center"
+              >
+                {SERVER_TYPES.map((type) => (
+                  <span key={type}>{type}</span>
+                ))}
+              </motion.div>
+
+              <div className="hero-metrics">
+                {METRICS.map((metric, index) => (
+                  <motion.div
+                    key={metric.label}
+                    initial={{ opacity: 0, y: 14 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.35 + index * 0.06, ease: 'easeOut' }}
+                    className="metric-panel"
+                  >
+                    <strong>{metric.value}</strong>
+                    <span>{metric.label}</span>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+
+            <div className="status-strip">
+              <div>
+                <Sword className="h-5 w-5 text-emerald-300" />
+                <span>Survival / SMP</span>
+                <small>Plugin stack ที่ไม่กินเครื่อง</small>
+              </div>
+              <div>
+                <Server className="h-5 w-5 text-cyan-300" />
+                <span>Infrastructure</span>
+                <small>Proxy, Linux, DDoS flow</small>
+              </div>
             </div>
           </motion.div>
-        </div>
-      </section>
+        </section>
 
-      {/* Services */}
-      <section id="services" className="py-32 px-6 bg-white border-y border-zinc-100">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-3 gap-16">
-            <div className="lg:col-span-1">
-              <span className="text-xs font-mono font-bold text-zinc-400 uppercase tracking-[0.2em] mb-4 block">Our Expertise</span>
-              <h2 className="text-4xl font-bold text-zinc-900 mb-6">บริการของ CADS</h2>
-              <p className="text-zinc-500 mb-8 leading-relaxed">
-                เราเน้นความเป็นระเบียบ ความเสถียร และประสิทธิภาพสูงสุด เพื่อให้เซิร์ฟเวอร์ของคุณเติบโตได้อย่างมั่นคง
-              </p>
-            </div>
-            <div className="lg:col-span-2 grid sm:grid-cols-2 gap-8">
-              {SERVICES.map((service, i) => (
-                <div key={i} className="card-hover flex flex-col">
-                  <div className="flex justify-between items-start mb-6">
-                    <div className="w-12 h-12 bg-zinc-50 rounded-xl flex items-center justify-center text-zinc-900 border border-zinc-100">
-                      {service.icon}
-                    </div>
-                    <span className="text-sm font-mono font-bold text-zinc-900 bg-zinc-100 px-3 py-1 rounded-full">
-                      {service.price}
-                    </span>
-                  </div>
-                  <h3 className="text-xl font-bold mb-1">{service.title}</h3>
-                  <p className="text-sm font-medium text-zinc-400 mb-4">{service.titleTh}</p>
-                  <p className="text-zinc-500 text-sm leading-relaxed mb-4 flex-grow">{service.desc}</p>
-                  <div className="pt-4 border-t border-zinc-50">
-                    <p className="text-zinc-400 text-xs italic">{service.descTh}</p>
-                  </div>
-                </div>
+        <section className="relative px-5 py-20 md:px-8">
+          <div className="mx-auto max-w-6xl text-center">
+            <p className="section-kicker">Why CADS</p>
+            <h2 className="section-title mx-auto">ทำไมถึงต้องเลือกเรา</h2>
+            <p className="mx-auto mt-5 max-w-3xl text-base leading-7 text-zinc-400">
+              Minecraft Server ที่ดีไม่ได้จบแค่เปิดติด แต่ต้องเล่นแล้วไม่สะดุด ดูแลง่าย
+              และพร้อมรับผู้เล่นเพิ่มโดยไม่ต้องรื้อระบบใหม่ทุกครั้ง
+            </p>
+
+            <div className="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+              {REASONS.map((reason, index) => (
+                <motion.article
+                  key={reason.title}
+                  initial={{ opacity: 0, y: 18 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: '-80px' }}
+                  transition={{ duration: 0.48, delay: index * 0.06, ease: 'easeOut' }}
+                  className="reason-card centered"
+                >
+                  <div className="reason-icon">{reason.icon}</div>
+                  <h3>{reason.title}</h3>
+                  <p>{reason.desc}</p>
+                </motion.article>
               ))}
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Contact Simple */}
-      <section id="contact" className="py-32 px-6 bg-zinc-900 text-white">
-        <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-4xl md:text-6xl font-bold tracking-tight mb-8">
-            Let's Talk.
-          </h2>
-          <p className="text-zinc-400 text-lg mb-12">
-            ยินดีให้คำปรึกษาและวางแผนโปรเจกต์ – <span className="text-white">สามารถติดต่อสอบถามก่อนได้เลยครับ</span>
-          </p>
-          <a 
-            href="https://discord.gg/xtVgj52nN6" 
-            target="_blank" 
-            rel="noreferrer"
-            className="inline-flex items-center gap-3 px-10 py-5 bg-white text-zinc-900 font-bold rounded-2xl hover:bg-zinc-200 transition-all text-xl"
-          >
-            Join our Discord <MessageSquare className="w-6 h-6" />
-          </a>
-          <div className="mt-16 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
-            <div className="flex items-center gap-3">
-              <img 
-                src="/Gemini_Generated_Image_mql5dwmql5dwmql5-Photoroom.png" 
-                alt="CADS Logo" 
-                className="w-8 h-8 object-contain invert"
-              />
-              <span className="font-mono font-bold tracking-tighter">CADS.</span>
+        <section id="services" className="relative border-y border-white/10 bg-white/[0.03] px-5 py-24 md:px-8">
+          <div className="mx-auto max-w-7xl">
+            <div className="mb-12 flex flex-col justify-between gap-6 md:flex-row md:items-end">
+              <div>
+                <p className="section-kicker">Services</p>
+                <h2 className="section-title">บริการหลักของ CADS</h2>
+              </div>
+              <p className="max-w-xl text-base leading-7 text-zinc-400">
+                เลือกงานได้ตั้งแต่ setup เล็กไปจนถึง network หลายเซิร์ฟเวอร์ ทุกแพ็กเกจปรับตามสภาพเครื่อง
+                plugin และเป้าหมายของเซิร์ฟเวอร์คุณ
+              </p>
             </div>
-            <p className="text-zinc-500 text-sm">© 2026 CADS Studio. Engineering Excellence.</p>
+
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {SERVICES.map((service, index) => (
+                <motion.article
+                  key={service.title}
+                  initial={{ opacity: 0, y: 18 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: '-80px' }}
+                  transition={{ duration: 0.45, delay: index * 0.04 }}
+                  className="service-card"
+                >
+                  <div className="mb-8 flex items-start justify-between gap-4">
+                    <div className="service-icon">{service.icon}</div>
+                    <span className="price-tag">{service.price}</span>
+                  </div>
+                  <h3>{service.title}</h3>
+                  <p className="service-th">{service.titleTh}</p>
+                  <p className="service-desc">{service.desc}</p>
+                </motion.article>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+
+        <section id="portfolio" className="px-5 py-24 md:px-8">
+          <div className="mx-auto max-w-7xl">
+            <div className="mb-12 flex flex-col justify-between gap-6 md:flex-row md:items-end">
+              <div>
+                <p className="section-kicker">Portfolio</p>
+                <h2 className="section-title">ผลงานและ GitHub</h2>
+              </div>
+              <p className="max-w-xl text-base leading-7 text-zinc-400">
+                ดูงานโค้ดและโปรเจกต์ของทีมได้จาก GitHub โดยตรง เหมาะสำหรับลูกค้าที่อยากเห็น style
+                การเขียนโค้ดก่อนเริ่มงาน custom plugin หรือระบบหลังบ้าน
+              </p>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              {PORTFOLIO.map((profile, index) => (
+                <motion.article
+                  key={profile.url}
+                  initial={{ opacity: 0, y: 18 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: '-80px' }}
+                  transition={{ duration: 0.48, delay: index * 0.08, ease: 'easeOut' }}
+                  className="github-card"
+                >
+                  <div className="github-avatar">
+                    <Github className="h-9 w-9" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="mb-2 flex items-start justify-between gap-4">
+                      <div>
+                        <h3>{profile.name}</h3>
+                        <p>{profile.role}</p>
+                      </div>
+                      <a href={profile.url} target="_blank" rel="noreferrer" className="github-open" aria-label={`Open ${profile.name} GitHub profile`}>
+                        <ExternalLink className="h-5 w-5" />
+                      </a>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {profile.tags.map((tag) => (
+                        <span key={tag}>{tag}</span>
+                      ))}
+                    </div>
+                    <button
+                      type="button"
+                      className="discord-copy"
+                      onClick={() => void copyDiscordTag(profile.discord)}
+                    >
+                      <Disc3 className="h-4 w-4" />
+                      <span>Discord:</span>
+                      <strong>{copiedDiscord === profile.discord ? 'Copied' : profile.discord}</strong>
+                      {copiedDiscord === profile.discord ? <Check className="h-4 w-4" /> : <Clipboard className="h-4 w-4" />}
+                    </button>
+                  </div>
+                </motion.article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section id="process" className="px-5 py-24 md:px-8">
+          <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[0.9fr_1.1fr]">
+            <div>
+              <p className="section-kicker">Workflow</p>
+              <h2 className="section-title">ทำงานเป็นขั้นตอน ชัดเจนตั้งแต่ต้น</h2>
+            </div>
+
+            <div className="space-y-4">
+              {PROCESS.map((step, index) => (
+                <motion.div
+                  key={step}
+                  initial={{ opacity: 0, x: 18 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true, margin: '-80px' }}
+                  transition={{ duration: 0.45, delay: index * 0.06, ease: 'easeOut' }}
+                  className="process-row"
+                >
+                  <div className="process-number">0{index + 1}</div>
+                  <p>{step}</p>
+                  <Check className="h-5 w-5 text-emerald-300" />
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section id="contact" className="px-5 pb-8 md:px-8">
+          <div className="mx-auto max-w-7xl overflow-hidden rounded-[2rem] border border-white/10 bg-zinc-950">
+            <div className="contact-band">
+              <div>
+                <p className="section-kicker">Contact</p>
+                <h2 className="max-w-4xl text-[clamp(2.25rem,6vw,5.75rem)] font-black leading-none tracking-normal">
+                  พร้อมทำให้เซิร์ฟเวอร์คุณนิ่งขึ้น
+                </h2>
+              </div>
+
+              <a href={DISCORD_URL} target="_blank" rel="noreferrer" className="contact-button">
+                คุยผ่าน Discord
+                <MessageSquare className="h-5 w-5" />
+              </a>
+            </div>
+
+            <footer className="flex flex-col justify-between gap-4 border-t border-white/10 px-6 py-6 text-sm text-zinc-500 md:flex-row md:items-center md:px-10">
+              <div className="flex items-center gap-3">
+                <img src={LOGO_SRC} alt="CADS Studio" className="h-8 w-8 object-contain" />
+                <span className="font-mono font-bold text-zinc-300">CADS Studio</span>
+              </div>
+              <p>© 2026 CADS Studio. Minecraft services and server engineering.</p>
+            </footer>
+          </div>
+        </section>
+      </main>
     </div>
   );
 }
-
-
