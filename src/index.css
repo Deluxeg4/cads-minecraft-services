@@ -91,24 +91,27 @@
     @apply mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row;
   }
 
-  .hero-metrics {
-    @apply mt-7 grid w-full max-w-2xl grid-cols-3 gap-3;
-  }
-
   .hero-visual {
     @apply pointer-events-none absolute inset-0 overflow-hidden rounded-[2rem];
   }
 
-  .metric-panel {
-    @apply min-h-28 rounded-2xl border border-white/10 bg-white/[0.06] p-4 backdrop-blur transition duration-300 hover:-translate-y-1 hover:border-emerald-300/30 hover:bg-white/[0.09];
+  .hero-bg-photo {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.22;
+    filter: saturate(0.9) contrast(1.08);
   }
 
-  .metric-panel strong {
-    @apply block text-xl font-black text-white md:text-2xl;
-  }
-
-  .metric-panel span {
-    @apply mt-2 block text-xs leading-5 text-zinc-500 md:text-sm;
+  .hero-visual::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 50% 18%, rgba(16, 185, 129, 0.20), transparent 34%),
+      linear-gradient(180deg, rgba(5, 6, 7, 0.62), rgba(5, 6, 7, 0.92));
   }
 
   .developer-callout {
@@ -131,18 +134,6 @@
     @apply inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-black text-black transition hover:bg-emerald-200;
   }
 
-  .server-type-row {
-    @apply mt-4 flex max-w-2xl flex-wrap gap-2;
-  }
-
-  .server-type-row.center {
-    @apply justify-center;
-  }
-
-  .server-type-row span {
-    @apply rounded-full border border-white/10 bg-white/[0.055] px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-zinc-300 transition duration-300 hover:border-emerald-300/35 hover:text-white;
-  }
-
   .service-card {
     @apply rounded-[1.5rem] border border-white/10 bg-zinc-950/75 p-6 transition duration-300 hover:-translate-y-1 hover:border-emerald-300/35 hover:bg-zinc-900/95 hover:shadow-[0_18px_70px_rgba(0,0,0,0.45)];
   }
@@ -161,6 +152,11 @@
 
   .price-tag {
     @apply rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1.5 font-mono text-sm font-bold text-cyan-200;
+  }
+
+  .price-tag-thai {
+    font-family: var(--font-sans);
+    @apply tracking-normal;
   }
 
   .service-th {
@@ -195,8 +191,92 @@
     @apply h-6 w-6;
   }
 
+  .why-visual {
+    @apply relative mx-auto mt-9 flex min-h-48 max-w-4xl items-end overflow-hidden rounded-[1.5rem] border border-white/10 bg-zinc-950/70 p-5 text-left shadow-[0_20px_70px_rgba(0,0,0,0.35)];
+  }
+
+  .why-visual img {
+    @apply absolute inset-0 h-full w-full object-cover opacity-35;
+  }
+
+  .why-visual::after,
+  .service-visual::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(5, 6, 7, 0.92), rgba(5, 6, 7, 0.54), rgba(5, 6, 7, 0.88));
+  }
+
+  .why-visual div,
+  .service-visual div {
+    @apply relative z-10 max-w-lg;
+  }
+
+  .why-visual span,
+  .service-visual span {
+    @apply font-mono text-xs font-bold uppercase tracking-[0.28em] text-emerald-300;
+  }
+
+  .why-visual strong,
+  .service-visual strong {
+    @apply mt-2 block text-2xl font-black leading-tight text-white md:text-3xl;
+  }
+
+  .service-visual {
+    @apply relative mb-8 flex min-h-56 items-end overflow-hidden rounded-[1.5rem] border border-white/10 bg-zinc-950/70 p-5 shadow-[0_20px_70px_rgba(0,0,0,0.35)] md:p-7;
+  }
+
+  .service-visual img {
+    @apply absolute inset-0 h-full w-full object-cover opacity-35;
+  }
+
   .github-card {
     @apply flex min-h-52 gap-5 rounded-[1.5rem] border border-white/10 bg-zinc-950/80 p-6 transition duration-300 hover:-translate-y-1 hover:border-cyan-300/35 hover:bg-zinc-900 hover:shadow-[0_20px_70px_rgba(6,182,212,0.10)];
+  }
+
+  .featured-project {
+    @apply relative min-h-80 overflow-hidden rounded-[1.5rem] border border-white/10 bg-zinc-950/80 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.42)] transition duration-300 hover:-translate-y-1 hover:border-emerald-300/35;
+  }
+
+  .featured-project > img {
+    @apply absolute inset-0 h-full w-full object-cover opacity-30;
+  }
+
+  .featured-project::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 78% 18%, rgba(16, 185, 129, 0.22), transparent 32%),
+      linear-gradient(90deg, rgba(5, 6, 7, 0.96), rgba(5, 6, 7, 0.72), rgba(5, 6, 7, 0.9));
+  }
+
+  .featured-project-content {
+    @apply relative z-10 flex min-h-68 flex-col justify-end;
+  }
+
+  .featured-project h3 {
+    @apply text-4xl font-black tracking-normal text-white md:text-5xl;
+  }
+
+  .featured-project p {
+    @apply mt-4 max-w-3xl text-base leading-7 text-zinc-300 md:text-lg;
+  }
+
+  .featured-project span {
+    @apply rounded-full border border-white/10 bg-white/[0.06] px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-zinc-300;
+  }
+
+  .project-status {
+    @apply border-amber-300/25 bg-amber-300/10 text-amber-200;
+  }
+
+  .project-url {
+    @apply font-mono text-cyan-200;
+  }
+
+  .project-open {
+    @apply inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-black text-black transition hover:bg-emerald-200;
   }
 
   .github-open {
@@ -249,6 +329,10 @@
 
   .contact-button {
     @apply inline-flex min-h-16 shrink-0 items-center justify-center gap-3 rounded-full bg-white px-8 py-5 text-lg font-black text-black transition hover:bg-emerald-200;
+  }
+
+  .back-to-top {
+    @apply fixed bottom-5 right-5 z-50 inline-flex h-12 w-12 items-center justify-center rounded-full border border-emerald-300/25 bg-zinc-950/85 text-emerald-200 shadow-[0_18px_55px_rgba(0,0,0,0.45)] backdrop-blur transition hover:-translate-y-1 hover:border-emerald-300/55 hover:bg-emerald-300 hover:text-black;
   }
 }
 
@@ -402,11 +486,6 @@
 }
 
 @media (max-width: 640px) {
-  .metric-panel {
-    min-height: 7.75rem;
-    padding: 0.85rem;
-  }
-
   .process-row {
     grid-template-columns: 1fr auto;
   }
